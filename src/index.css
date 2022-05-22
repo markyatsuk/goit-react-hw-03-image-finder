@@ -205,3 +205,14 @@ img {
 .Button:focus {
   background-color: #303f9f;
 }
+
+.search-form__input {
+  width: 400px;
+  padding: 0px 15px;
+  color: rgb(62, 26, 95);
+  margin-right: 15px;
+  font-size: 16px;
+  outline: none;
+  border: 0px;
+  height: 41px;
+}
