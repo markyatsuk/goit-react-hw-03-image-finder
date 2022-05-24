@@ -22,6 +22,9 @@ export default class PicturesApiService {
   resetPage() {
     this.page = 1;
   }
+  page() {
+    return this.page;
+  }
   get query() {
     return this.searchQuery;
   }
