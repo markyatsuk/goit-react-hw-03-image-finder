@@ -3,6 +3,7 @@ import { ImageGalleryItem } from "./ImageGalleryItem";
 import PicturesApiService from "../FetchApi/FetchAPI";
 import { Loader } from "../Loader/Loader";
 import { Button } from "../Button/Button";
+import { Modal } from "../Modal/Modal";
 const picturesApiService = new PicturesApiService();
 
 export default class ImageGallery extends Component {
@@ -11,11 +12,13 @@ export default class ImageGallery extends Component {
     errorText: null,
     status: "idle",
     totalHits: 0,
+    showModal: false,
+    largeImageURL: "",
   };
   componentDidUpdate(prevProps, prevState) {
     const prevSearch = prevProps.searchResult;
     const currentSearch = this.props.searchResult;
-
+    picturesApiService.resetPage();
     if (prevSearch !== currentSearch) {
       this.setState({ status: "pending" });
 
@@ -35,10 +38,26 @@ export default class ImageGallery extends Component {
     }
   }
   onLoadMore = (data) => {
-    this.setState({ searchResult: data });
+    this.setState((prevState) => {
+      return {
+        searchResult: prevState.searchResult.concat(data),
+      };
+    });
+  };
+  handleModal = (url) => {
+    this.setState(({ showModal }) => ({
+      largeImageURL: url,
+      showModal: !showModal,
+    }));
+  };
+  onModalClose = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
   };
   render() {
-    const { searchResult, status, totalHits } = this.state;
+    const { searchResult, status, totalHits, showModal, largeImageURL } =
+      this.state;
     if (status === "pending") {
       return <Loader />;
     }
@@ -48,8 +67,17 @@ export default class ImageGallery extends Component {
     if (status === "resolved") {
       return (
         <div>
+          {showModal && (
+            <Modal
+              largeImageURL={largeImageURL}
+              onModalClose={this.onModalClose}
+            />
+          )}
           <ul className="ImageGallery">
-            <ImageGalleryItem datas={searchResult} />
+            <ImageGalleryItem
+              datas={searchResult}
+              handleModal={this.handleModal}
+            />
           </ul>
 
           {totalHits > 12 && (

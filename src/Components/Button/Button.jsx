@@ -7,17 +7,20 @@ class Button extends Component {
   state = {
     status: "resolved",
   };
-  onLoadMore = () => {
+  onLoadMoreClick = () => {
     this.setState({ status: "pending" });
+    picturesApiService.query = this.props.searchValue;
+    if (picturesApiService.page === 1) {
+      picturesApiService.incrementPage();
+    }
+
     picturesApiService.fetchPictures().then((fetchResponse) => {
-      if (
-        fetchResponse.data.hits * picturesApiService.page >
-        this.props.totalHits
-      ) {
-        this.setState({ status: "rejected" });
-      }
-      this.setState({ status: "resolved" });
       this.props.onLoadMore(fetchResponse.data.hits);
+      if (12 * picturesApiService.page >= this.props.totalHits) {
+        this.setState({ status: "rejected" });
+      } else {
+        this.setState({ status: "resolved" });
+      }
     });
   };
   render() {
@@ -27,7 +30,7 @@ class Button extends Component {
     }
     if (status === "resolved") {
       return (
-        <button type="button" className="Button" onClick={this.onLoadMore}>
+        <button type="button" className="Button" onClick={this.onLoadMoreClick}>
           Load more
         </button>
       );
